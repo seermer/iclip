@@ -176,6 +176,11 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
                     scale levels, each is a 4D-tensor, the channels number \
                     is num_base_priors * 4.
         """
+        background = F.normalize(self.background, dim=1)
+        self.num_classes = len(caption_feat_all_GPU)
+        caption_feat_all_GPU = torch.cat((caption_feat_all_GPU, background), dim=0)
+        caption_feat_all_GPU = caption_feat_all_GPU.to(torch.float32).T
+
         # shared part
         if self.num_shared_convs > 0:
             for conv in self.shared_convs:
