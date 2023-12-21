@@ -31,8 +31,8 @@ def seed_all(seed: int = 1):
     torch.cuda.manual_seed_all(seed)
     cudnn.benchmark = False
     cudnn.deterministic = True
-    torch.set_deterministic_debug_mode('warn')
-    torch.use_deterministic_algorithms(True, warn_only=True)
+    # torch.set_deterministic_debug_mode('warn')
+    # torch.use_deterministic_algorithms(True, warn_only=True)
     print('DETERMINISTIC SET')
 
 
