@@ -105,6 +105,7 @@ class IclipRoIHead(StandardRoIHead):
                                           bbox_results['bbox_feats'],
                                           batch_gt_instances)
             losses.update(mask_results['loss_mask'])
+        print('[DEBUG]LOSSES,', losses)
 
         return losses
 

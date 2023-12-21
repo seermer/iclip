@@ -131,6 +131,7 @@ class IclipBBoxHead(BBoxHead):
 
         if cls_score is not None:
             avg_factor = max(torch.sum(label_weights > 0).float().item(), 1.)
+            print('[DEBUG]AVG_FACTOR,', avg_factor)
             if cls_score.numel() > 0:
                 loss_cls_ = self.loss_cls(
                     cls_score,
@@ -151,6 +152,7 @@ class IclipBBoxHead(BBoxHead):
             bg_class_ind = self.num_classes
             # 0~self.num_classes-1 are FG, self.num_classes is BG
             pos_inds = (labels >= 0) & (labels < bg_class_ind)
+            print('[DEBUG]POS_INDS,', len(pos_inds))
             # do not perform bounding box regression for BG anymore.
             if pos_inds.any():
                 if self.reg_decoded_bbox:
