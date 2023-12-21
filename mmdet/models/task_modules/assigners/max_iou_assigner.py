@@ -118,6 +118,7 @@ class MaxIoUAssigner(BaseAssigner):
             >>> expected_gt_inds = torch.LongTensor([1, 0])
             >>> assert torch.all(assign_result.gt_inds == expected_gt_inds)
         """
+        print(vars(gt_instances))
         gt_bboxes = gt_instances.bboxes
         priors = pred_instances.priors
         gt_labels = gt_instances.labels
