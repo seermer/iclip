@@ -121,7 +121,7 @@ class MaxIoUAssigner(BaseAssigner):
         gt_bboxes = gt_instances.bboxes
         priors = pred_instances.priors
         gt_labels = gt_instances.labels
-        if gt_instances_ignore is not None:
+        if gt_instances_ignore is not None and hasattr(gt_instances_ignore, 'bboxes'):
             gt_bboxes_ignore = gt_instances_ignore.bboxes
         else:
             gt_bboxes_ignore = None
