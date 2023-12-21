@@ -3896,79 +3896,79 @@ class Collage(BaseTransform):
         else:
             raise AttributeError
 
-    # @autocast_box_type()
-    # def transform(self, results: dict) -> dict:
-    #     assert 'mix_results' in results
-    #
-    #     result_patch = copy.deepcopy(results)
-    #     others_patch = copy.deepcopy(results['mix_results'])
-    #     sub_img_wh = self.img_scale[0] // self.n
-    #
-    #     for i in range(self.n):
-    #         if i == 0: # first row
-    #             img_row = self.patch_proc(result_patch['img'], (sub_img_wh, sub_img_wh))
-    #             gt_bboxes = np.array([[sub_img_wh//2, sub_img_wh//2]], dtype=np.float32)
-    #             for other_patch in others_patch[0:self.n-1]:
-    #                 img_o = self.patch_proc(other_patch['img'], (sub_img_wh, sub_img_wh))
-    #                 img_row = np.concatenate((img_row, img_o), axis=1)
-    #                 gt_bboxes = np.concatenate((gt_bboxes, gt_bboxes[-1].reshape((1,2))+[sub_img_wh, 0]), axis=0)
-    #             img_col = img_row
-    #             gt_bboxes = np.expand_dims(gt_bboxes, axis=0)
-    #         else:
-    #             img_row = None
-    #             for other_patch in others_patch[i*self.n-1 : (i+1)*self.n-1]:
-    #                 img_o = self.patch_proc(other_patch['img'], (sub_img_wh, sub_img_wh))
-    #                 img_row = np.concatenate((img_row, img_o), axis=1) if img_row is not None else img_o
-    #             img_col = np.concatenate((img_col, img_row), axis=0)
-    #             gt_bboxes = np.concatenate((gt_bboxes, gt_bboxes[-1,:].reshape((1,-1,2))+[[0, sub_img_wh]]), axis=0)
-    #     results['img'] = img_col
-    #     results['img_shape'] = img_col.shape[:2]
-    #
-    #     results['gt_bboxes'] = self.get_bboxes_target(gt_bboxes, sub_img_wh)
-    #     results['bboxes'] = results['gt_bboxes']
-    #     results['gt_bboxes_labels'] = self.get_pseudo_label(gt_bboxes)
-    #
-    #     caption_feat = [results['capfeat']]
-    #     for i in results['mix_results']:
-    #         caption_feat.append(i['capfeat'])
-    #     results['capfeat'] = torch.cat(caption_feat, dim=0)
-    #     return results
-
     @autocast_box_type()
     def transform(self, results: dict) -> dict:
         assert 'mix_results' in results
 
+        result_patch = copy.deepcopy(results)
+        others_patch = copy.deepcopy(results['mix_results'])
         sub_img_wh = self.img_scale[0] // self.n
-        out_img_wh = sub_img_wh * self.n
-        sub_img_shape = (sub_img_wh, sub_img_wh)
-        collage_lst = [self.patch_proc(results['img'], sub_img_shape)]
-        collage_lst.extend(self.patch_proc(img['img'], sub_img_shape)
-                           for img in results['mix_results'][:self.n * self.n - 1])
 
-        collage_arr = np.empty((out_img_wh, out_img_wh, collage_lst[0].shape[-1]), dtype=collage_lst[0].dtype)
-        for i, img in enumerate(collage_lst):
-            row, col = i // self.n * sub_img_wh, i % self.n * sub_img_wh
-            collage_arr[row:row + sub_img_wh, col:col + sub_img_wh] = img
+        for i in range(self.n):
+            if i == 0: # first row
+                img_row = self.patch_proc(result_patch['img'], (sub_img_wh, sub_img_wh))
+                gt_bboxes = np.array([[sub_img_wh//2, sub_img_wh//2]], dtype=np.float32)
+                for other_patch in others_patch[0:self.n-1]:
+                    img_o = self.patch_proc(other_patch['img'], (sub_img_wh, sub_img_wh))
+                    img_row = np.concatenate((img_row, img_o), axis=1)
+                    gt_bboxes = np.concatenate((gt_bboxes, gt_bboxes[-1].reshape((1,2))+[sub_img_wh, 0]), axis=0)
+                img_col = img_row
+                gt_bboxes = np.expand_dims(gt_bboxes, axis=0)
+            else:
+                img_row = None
+                for other_patch in others_patch[i*self.n-1 : (i+1)*self.n-1]:
+                    img_o = self.patch_proc(other_patch['img'], (sub_img_wh, sub_img_wh))
+                    img_row = np.concatenate((img_row, img_o), axis=1) if img_row is not None else img_o
+                img_col = np.concatenate((img_col, img_row), axis=0)
+                gt_bboxes = np.concatenate((gt_bboxes, gt_bboxes[-1,:].reshape((1,-1,2))+[[0, sub_img_wh]]), axis=0)
+        results['img'] = img_col
+        results['img_shape'] = img_col.shape[:2]
 
-        results['img'] = collage_arr
-        results['img_shape'] = collage_arr.shape[:2]
-
-        bbox_tl = np.tile(np.arange(0, self.n * sub_img_wh, sub_img_wh), (self.n, 1))
-        bbox_x1 = bbox_tl.flatten()
-        bbox_y1 = bbox_tl.T.flatten()
-        bbox_x2 = bbox_x1 + sub_img_wh
-        bbox_y2 = bbox_y1 + sub_img_wh
-
-        gt_bboxes = np.stack([bbox_x1, bbox_y1, bbox_x2, bbox_y2]).T.astype(np.float32)
-
-        results['gt_bboxes'] = gt_bboxes
-        results['gt_bboxes_labels'] = np.arange(len(gt_bboxes))
+        results['gt_bboxes'] = self.get_bboxes_target(gt_bboxes, sub_img_wh)
+        results['bboxes'] = results['gt_bboxes']
+        results['gt_bboxes_labels'] = self.get_pseudo_label(gt_bboxes)
 
         caption_feat = [results['capfeat']]
         for i in results['mix_results']:
             caption_feat.append(i['capfeat'])
         results['capfeat'] = torch.cat(caption_feat, dim=0)
         return results
+
+    # @autocast_box_type()
+    # def transform(self, results: dict) -> dict:
+    #     assert 'mix_results' in results
+    #
+    #     sub_img_wh = self.img_scale[0] // self.n
+    #     out_img_wh = sub_img_wh * self.n
+    #     sub_img_shape = (sub_img_wh, sub_img_wh)
+    #     collage_lst = [self.patch_proc(results['img'], sub_img_shape)]
+    #     collage_lst.extend(self.patch_proc(img['img'], sub_img_shape)
+    #                        for img in results['mix_results'][:self.n * self.n - 1])
+    #
+    #     collage_arr = np.empty((out_img_wh, out_img_wh, collage_lst[0].shape[-1]), dtype=collage_lst[0].dtype)
+    #     for i, img in enumerate(collage_lst):
+    #         row, col = i // self.n * sub_img_wh, i % self.n * sub_img_wh
+    #         collage_arr[row:row + sub_img_wh, col:col + sub_img_wh] = img
+    #
+    #     results['img'] = collage_arr
+    #     results['img_shape'] = collage_arr.shape[:2]
+    #
+    #     bbox_tl = np.tile(np.arange(0, self.n * sub_img_wh, sub_img_wh), (self.n, 1))
+    #     bbox_x1 = bbox_tl.flatten()
+    #     bbox_y1 = bbox_tl.T.flatten()
+    #     bbox_x2 = bbox_x1 + sub_img_wh
+    #     bbox_y2 = bbox_y1 + sub_img_wh
+    #
+    #     gt_bboxes = np.stack([bbox_x1, bbox_y1, bbox_x2, bbox_y2]).T.astype(np.float32)
+    #
+    #     results['gt_bboxes'] = gt_bboxes
+    #     results['gt_bboxes_labels'] = np.arange(len(gt_bboxes))
+    #
+    #     caption_feat = [results['capfeat']]
+    #     for i in results['mix_results']:
+    #         caption_feat.append(i['capfeat'])
+    #     results['capfeat'] = torch.cat(caption_feat, dim=0)
+    #     return results
 
     def get_pseudo_label(self, bboxes):
         n = len(bboxes.reshape(-1, 2))
