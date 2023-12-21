@@ -114,7 +114,7 @@ def unpack_gt_instances(batch_data_samples: SampleList) -> tuple:
     for data_sample in batch_data_samples:
         batch_img_metas.append(data_sample.metainfo)
         batch_gt_instances.append(data_sample.gt_instances)
-        if 'ignored_instances' in data_sample:
+        if 'ignored_instances' in data_sample and data_sample._data_fields:
             batch_gt_instances_ignore.append(data_sample.ignored_instances)
         else:
             batch_gt_instances_ignore.append(None)
