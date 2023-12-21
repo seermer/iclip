@@ -155,24 +155,21 @@ class IclipRoIHead(StandardRoIHead):
                                                          (0, 0, 0, batch_size_per_GPU*100 - caption_feat_1_GPU.shape[0])) # 100 means the max collage
         #print(caption_feat_1_GPU.device, 1,caption_feat_1_GPU, gt_per_img)
 
-        if not self.gather_all_cap:
-            return caption_feat_1_GPU, gt_per_img
-        else:
-            local_rank = torch.distributed.get_rank()
-            world_size = torch.distributed.get_world_size()
-            gathered_tensors = [torch.empty_like(pad_caption_feat_1_GPU) for _ in range(world_size)]
-            torch.distributed.all_gather(gathered_tensors, pad_caption_feat_1_GPU)
-            on_this_GPU = gathered_tensors.pop(local_rank)
+        local_rank = torch.distributed.get_rank()
+        world_size = torch.distributed.get_world_size()
+        gathered_tensors = [torch.empty_like(pad_caption_feat_1_GPU) for _ in range(world_size)]
+        torch.distributed.all_gather(gathered_tensors, pad_caption_feat_1_GPU)
+        on_this_GPU = gathered_tensors.pop(local_rank)
 
-            caption_feat_1_GPU = remove_pad(on_this_GPU)
-            caption_feat_7_GPU = remove_pad(torch.cat(gathered_tensors, dim=0))
+        caption_feat_1_GPU = remove_pad(on_this_GPU)
+        caption_feat_7_GPU = remove_pad(torch.cat(gathered_tensors, dim=0))
 
-            caption_feat_all_GPU = torch.cat([caption_feat_1_GPU, caption_feat_7_GPU], dim=0)
-            #print(local_rank, world_size, 2, caption_feat_1_GPU)
-            #print(local_rank, world_size, 3,caption_feat_all_GPU)
-            #print(local_rank, world_size, 4,caption_feat_1_GPU.shape)
-            #print(local_rank, world_size, 5,caption_feat_7_GPU.shape)
-            return caption_feat_all_GPU, gt_per_img
+        caption_feat_all_GPU = torch.cat([caption_feat_1_GPU, caption_feat_7_GPU], dim=0)
+        #print(local_rank, world_size, 2, caption_feat_1_GPU)
+        #print(local_rank, world_size, 3,caption_feat_all_GPU)
+        #print(local_rank, world_size, 4,caption_feat_1_GPU.shape)
+        #print(local_rank, world_size, 5,caption_feat_7_GPU.shape)
+        return caption_feat_all_GPU, gt_per_img
 
     def bbox_loss(self, x: Tuple[Tensor],
                   sampling_results: List[SamplingResult],
