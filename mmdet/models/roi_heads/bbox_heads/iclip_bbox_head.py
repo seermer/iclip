@@ -80,7 +80,7 @@ class IclipBBoxHead(BBoxHead):
                 x = torch.mean(x, dim=(-1, -2))
 
         outputs_cls_feat = self.fc_cls(x)
-        outputs_cls_feat = F.normalize(outputs_cls_feat, dim=2)
+        outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
         tempurature = torch.clip(self.logit_scale.exp(), min=None, max=10.0)
         cls_score = outputs_cls_feat @ caption_feat_all_GPU * tempurature
 

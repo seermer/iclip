@@ -178,10 +178,8 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
         """
         background = F.normalize(self.background, dim=1)
         self.num_classes = len(caption_feat_all_GPU)
-        print('shape1', caption_feat_all_GPU.shape)
         caption_feat_all_GPU = torch.cat((caption_feat_all_GPU, background), dim=0)
         caption_feat_all_GPU = caption_feat_all_GPU.to(torch.float32).T
-        print('shape2', caption_feat_all_GPU.shape)
 
         # shared part
         if self.num_shared_convs > 0:
@@ -219,8 +217,7 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
             x_reg = self.relu(fc(x_reg))
 
         outputs_cls_feat = self.fc_cls(x)
-        print('shape3', outputs_cls_feat.shape)
-        outputs_cls_feat = F.normalize(outputs_cls_feat, dim=2)
+        outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
         tempurature = torch.clip(self.logit_scale.exp(), min=None, max=10.0)
         cls_score = outputs_cls_feat @ caption_feat_all_GPU * tempurature
 
