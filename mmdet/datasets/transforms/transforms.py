@@ -3956,11 +3956,10 @@ class Collage(BaseTransform):
         bbox_tl = np.tile(np.arange(0, self.n * sub_img_wh, sub_img_wh), (self.n, 1))
         bbox_x1 = bbox_tl.flatten()
         bbox_y1 = bbox_tl.T.flatten()
-        sub_img_wh = sub_img_wh // 2 * 2
         bbox_x2 = bbox_x1 + sub_img_wh
         bbox_y2 = bbox_y1 + sub_img_wh
 
-        gt_bboxes = np.stack([bbox_x1, bbox_y1, bbox_x2, bbox_y2]).T
+        gt_bboxes = np.stack([bbox_x1, bbox_y1, bbox_x2, bbox_y2]).T.astype(np.float32)
 
         results['gt_bboxes'] = gt_bboxes
         results['gt_bboxes_labels'] = np.arange(len(gt_bboxes))
