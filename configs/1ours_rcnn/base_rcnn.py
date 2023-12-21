@@ -1,7 +1,7 @@
 _base_ = '../faster_rcnn/faster-rcnn_r50_fpn_1x_coco.py'
 
 dataset_type = 'IclipDataset'
-data_root = '/home/seermer/Python/Projects/datasets/lvis'
+data_root = '/media/Auriga/fangyic/yfcc15m/'
 
 img_scale = (1024, 1024)  # width, height
 
