@@ -3947,7 +3947,25 @@ class Collage(BaseTransform):
             row, col = i // self.n * sub_img_wh, i % self.n * sub_img_wh
             collage_arr[row:row + sub_img_wh, col:col + sub_img_wh] = img
 
-        return collage_arr
+        results['img'] = collage_arr
+        results['img_shape'] = collage_arr.shape[:2]
+
+        bbox_tl = np.tile(np.arange(0, self.n * sub_img_wh, sub_img_wh), (self.n, 1))
+        bbox_x1 = bbox_tl.flatten()
+        bbox_y1 = bbox_tl.T.flatten()
+        bbox_x2 = bbox_x1 + sub_img_wh
+        bbox_y2 = bbox_y1 + sub_img_wh
+
+        gt_bboxes = np.stack([bbox_x1, bbox_y1, bbox_x2, bbox_y2]).T
+
+        results['gt_bboxes'] = self.get_bboxes_target(gt_bboxes, sub_img_wh)
+        results['gt_bboxes_labels'] = self.get_pseudo_label(gt_bboxes)
+
+        caption_feat = [results['capfeat']]
+        for i in results['mix_results']:
+            caption_feat.append(i['capfeat'])
+        results['capfeat'] = torch.cat(caption_feat, dim=0)
+        return results
 
     def get_pseudo_label(self, bboxes):
         n = len(bboxes.reshape(-1, 2))
