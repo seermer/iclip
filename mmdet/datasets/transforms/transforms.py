@@ -3925,6 +3925,7 @@ class Collage(BaseTransform):
         results['img_shape'] = img_col.shape[:2]
 
         results['gt_bboxes'] = self.get_bboxes_target(gt_bboxes, sub_img_wh)
+        results['bboxes'] = results['gt_bboxes']
         results['gt_bboxes_labels'] = self.get_pseudo_label(gt_bboxes)
 
         caption_feat = [results['capfeat']]
