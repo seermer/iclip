@@ -66,9 +66,11 @@ class IclipBBoxHead(BBoxHead):
                   is num_base_priors * 4.
         """
         background = F.normalize(self.background, dim=1)
+        print(caption_feat_all_GPU.shape)
         self.num_classes = len(caption_feat_all_GPU)
         caption_feat_all_GPU = torch.cat((caption_feat_all_GPU, background), dim=0)
         caption_feat_all_GPU = caption_feat_all_GPU.T.to(torch.float32)
+        print(caption_feat_all_GPU.shape)
 
         if self.with_avg_pool:
             if x.numel() > 0:
