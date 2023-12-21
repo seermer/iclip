@@ -66,11 +66,11 @@ class IclipBBoxHead(BBoxHead):
                   is num_base_priors * 4.
         """
         background = F.normalize(self.background, dim=1)
-        print(caption_feat_all_GPU.shape)
+        print('shape1', caption_feat_all_GPU.shape)
         self.num_classes = len(caption_feat_all_GPU)
         caption_feat_all_GPU = torch.cat((caption_feat_all_GPU, background), dim=0)
         caption_feat_all_GPU = caption_feat_all_GPU.T.to(torch.float32)
-        print(caption_feat_all_GPU.shape)
+        print('shape2', caption_feat_all_GPU.shape)
 
         if self.with_avg_pool:
             if x.numel() > 0:
@@ -84,6 +84,7 @@ class IclipBBoxHead(BBoxHead):
         outputs_cls_feat = self.fc_cls(x)
         outputs_cls_feat = F.normalize(outputs_cls_feat, dim=2)
         tempurature = torch.clip(self.logit_scale.exp(), min=None, max=10.0)
+        print('shape3', outputs_cls_feat)
         cls_score = outputs_cls_feat @ caption_feat_all_GPU * tempurature
 
         bbox_pred = self.fc_reg(x)
