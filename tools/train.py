@@ -20,20 +20,15 @@ def seed_all(seed: int = 1):
     os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
     os.environ['PYTHONHASHSEED'] = str(seed)
 
-    import numpy
-    import torch, random
-    from torch.backends import cudnn
+    import torch, random, numpy
 
     random.seed(seed)
     numpy.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-    cudnn.benchmark = False
-    cudnn.deterministic = True
     # torch.set_deterministic_debug_mode('warn')
     # torch.use_deterministic_algorithms(True, warn_only=True)
-    print('DETERMINISTIC SET')
 
 
 def parse_args():
