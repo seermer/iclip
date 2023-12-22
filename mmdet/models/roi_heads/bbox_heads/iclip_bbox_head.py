@@ -19,6 +19,7 @@ from mmdet.structures.bbox import get_box_tensor, scale_boxes
 from mmdet.utils import ConfigType, InstanceList, OptMultiConfig
 
 from mmdet.models.roi_heads.bbox_heads.bbox_head import BBoxHead
+from mmdet.utils.logger import print_log
 import numpy as np
 
 
@@ -131,7 +132,7 @@ class IclipBBoxHead(BBoxHead):
 
         if cls_score is not None:
             avg_factor = max(torch.sum(label_weights > 0).float().item(), 1.)
-            print('[DEBUG]AVG_FACTOR,', avg_factor)
+            print_log(f'[DEBUG]AVG_FACTOR, {avg_factor}', 'mmdet')
             if cls_score.numel() > 0:
                 loss_cls_ = self.loss_cls(
                     cls_score,
@@ -152,7 +153,7 @@ class IclipBBoxHead(BBoxHead):
             bg_class_ind = self.num_classes
             # 0~self.num_classes-1 are FG, self.num_classes is BG
             pos_inds = (labels >= 0) & (labels < bg_class_ind)
-            print('[DEBUG]POS_INDS,', len(pos_inds))
+            print_log(f'[DEBUG]POS_INDS, {len(pos_inds)}', 'mmdet')
             # do not perform bounding box regression for BG anymore.
             if pos_inds.any():
                 if self.reg_decoded_bbox:

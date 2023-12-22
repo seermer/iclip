@@ -12,6 +12,7 @@ from ..task_modules.samplers import SamplingResult
 from ..utils import empty_instances, unpack_gt_instances
 from .base_roi_head import BaseRoIHead
 from mmdet.models.roi_heads.standard_roi_head import StandardRoIHead
+from mmdet.utils.logger import print_log
 
 
 @MODELS.register_module()
@@ -105,7 +106,7 @@ class IclipRoIHead(StandardRoIHead):
                                           bbox_results['bbox_feats'],
                                           batch_gt_instances)
             losses.update(mask_results['loss_mask'])
-        print('[DEBUG]LOSSES,', losses)
+        print_log(f'[DEBUG]LOSSES, {losses}', 'mmdet')
 
         return losses
 
