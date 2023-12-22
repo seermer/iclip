@@ -66,9 +66,25 @@ model = dict(
                 type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
             loss_bbox=dict(type='L1Loss', loss_weight=1.0))), )
 
+max_iters = 102622   # 102622 is 1 epoch with batchsize 18*8  each iter == clip 43 epochs  18*8*102622 = 15M
+                     # 102622 is 1/3 epoch with bs      6*8   each iter == clip 135 iter    6*8*102622  = 5M
 
+param_scheduler = [
+    dict(
+        type='MultiStepLR',
+        begin=0,
+        end=max_iters,
+        by_epoch=False,
+        milestones=[max_iters // 5 * 4],
+        gamma=0.1)]
 
-train_cfg = dict(max_epochs=1, type='EpochBasedTrainLoop', val_interval=10000000000000)
+train_cfg = dict(
+    _delete_ = True,
+    type='IterBasedTrainLoop',
+    max_iters=max_iters,
+    val_interval=10000000000000)
+
+# train_cfg = dict(max_epochs=1, type='EpochBasedTrainLoop', val_interval=10000000000000)
 val_cfg = None
 val_dataloader = None
 val_evaluator = None
