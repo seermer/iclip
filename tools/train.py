@@ -84,7 +84,7 @@ def parse_args():
 
 
 def main():
-    seed_all(1)
+    seed_all(42)
     args = parse_args()
 
     # Reduce the number of repeated compilations and improve
