@@ -16,6 +16,8 @@ train_pipeline = [
     dict(type='PackDetInputs', meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape', 'scale_factor'))
 ]
 
+custom_hooks = [dict(type='CheckInvalidLossHook', interval=1)]
+
 train_dataset = dict(
     # use MultiImageMixDataset wrapper to support mosaic and mixup
     type='MultiImageMixDataset',
