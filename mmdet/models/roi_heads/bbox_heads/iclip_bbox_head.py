@@ -179,6 +179,8 @@ class IclipBBoxHead(BBoxHead):
                     reduction_override=reduction_override)
             else:
                 losses['loss_bbox'] = bbox_pred[pos_inds].sum()
+                print(f'[DEBUG]POS_INDS, WARNING', losses['loss_bbox'])
+                print_log(f'[DEBUG]POS_INDS, WARNING, {losses["loss_bbox"]}', 'current')
 
         return losses
 

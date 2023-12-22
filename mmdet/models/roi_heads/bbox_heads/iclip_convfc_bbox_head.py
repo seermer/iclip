@@ -10,6 +10,7 @@ from torch import Tensor
 
 from mmdet.registry import MODELS
 from .iclip_bbox_head import IclipBBoxHead
+from mmdet.utils.logger import print_log
 
 
 @MODELS.register_module()
@@ -218,8 +219,9 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
 
         outputs_cls_feat = self.fc_cls(x)
         outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
-        tempurature = torch.clip(self.logit_scale.exp(), min=None, max=10.0)
-        cls_score = outputs_cls_feat @ caption_feat_all_GPU * tempurature
+        temperature = torch.clip(self.logit_scale.exp(), min=None, max=10.0)
+        print_log(f'[DEBUG]TEMPERATURE: {temperature}', 'current')
+        cls_score = outputs_cls_feat @ caption_feat_all_GPU * temperature
 
         bbox_pred = self.fc_reg(x_reg) if self.with_reg else None
         return cls_score, bbox_pred
