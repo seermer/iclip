@@ -3,12 +3,12 @@ _base_ = 'faster-rcnn_r50_fpn_1x_coco.py'
 dataset_type = 'IclipDataset'
 data_root = '/media/Auriga/fangyic/yfcc15m/'
 
-img_scale = (64, 64)  # width, height
+img_scale = (128, 128)  # width, height
 
 train_pipeline = [
     dict(type='Collage', img_scale=img_scale, grid_range=(2, 11)),
     dict(type='RandomChoiceResize',
-         scales=[(64, 64)],
+         scales=[(128, 128)],
          keep_ratio=True),
     dict(type='PackDetInputs', meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape', 'scale_factor'))
 ]
@@ -34,7 +34,7 @@ train_dataset = dict(
     pipeline=train_pipeline)
 
 train_dataloader = dict(
-    batch_size=16,
+    batch_size=256,
     num_workers=5,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
