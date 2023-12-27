@@ -3,16 +3,15 @@ _base_ = 'faster-rcnn_r50_fpn_1x_coco.py'
 dataset_type = 'IclipDataset'
 data_root = '/media/Auriga/fangyic/yfcc15m/'
 
-img_scale = (1024, 1024)  # width, height
+img_scale = (2048, 2048)  # width, height
 
 train_pipeline = [
-    dict(type='Collage', img_scale=img_scale, grid_range=(2, 11)),
+    dict(type='Collage', img_scale=img_scale, grid_range=(5, 18), mode='rescalecentercrop'),
     dict(type='RandomChoiceResize',
-         scales=[(608, 608), (640, 640), (672, 672), (704, 704),
-                 (736, 763), (768, 768), (800, 1333), (832, 832),
-                 (864, 864), (896, 896), (928, 928), (960, 960),
-                 (992, 992), (1024, 1024)],
-         keep_ratio=True),
+                    scales=[(1763, 1763),  (1833, 1833),
+                            (1896, 1896), (1928, 1928), (1960, 1960), 
+                            (1992, 1992), (2048, 2048)],
+                    keep_ratio=True),
     dict(type='PackDetInputs', meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape', 'scale_factor'))
 ]
 
@@ -28,16 +27,16 @@ train_dataset = dict(
         data_prefix=dict(img='./'),
         pipeline=[
             dict(type='LoadImageFromFile', backend_args=None),
-            dict(type='LoadExtractClipText',
-                 text_encoder_model='RN50',
-                 save_folder=data_root + 'capfeat/', init_clip=False, ann_file=data_root + 'annotation.json')
+            dict(type='LoadExtractClipText', 
+                        text_encoder_model='RN50', 
+                        save_folder=data_root+'capfeat/', init_clip=False, ann_file=data_root+'annotation.json')
         ],
         filter_cfg=dict(filter_empty_gt=False),
         backend_args=None),
     pipeline=train_pipeline)
 
 train_dataloader = dict(
-    batch_size=18,
+    batch_size=6,
     num_workers=5,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
@@ -66,8 +65,9 @@ model = dict(
                 type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
             loss_bbox=dict(type='L1Loss', loss_weight=1.0))), )
 
-max_iters = 102622  # 102622 is 1 epoch with batchsize 18*8  each iter == clip 43 epochs  18*8*102622 = 15M
-# 102622 is 1/3 epoch with bs      6*8   each iter == clip 135 iter    6*8*102622  = 5M
+
+max_iters = 102622   # 102622 is 1 epoch with batchsize 18*8  each iter == clip 43 epochs  18*8*102622 = 15M
+                     # 102622 is 1/3 epoch with bs      6*8   each iter == clip 135 iter    6*8*102622  = 5M   
 
 param_scheduler = [
     dict(
@@ -81,15 +81,26 @@ param_scheduler = [
         gamma=0.1)]
 
 train_cfg = dict(
-    _delete_=True,
+    _delete_ = True,
     type='IterBasedTrainLoop',
     max_iters=max_iters,
     val_interval=10000000000000)
 
-# train_cfg = dict(max_epochs=1, type='EpochBasedTrainLoop', val_interval=10000000000000)
+default_hooks = dict(
+    checkpoint=dict(
+        type='CheckpointHook',
+        by_epoch=False,
+        interval=5000,
+        max_keep_ckpts=3))
+
 val_cfg = None
 val_dataloader = None
 val_evaluator = None
 test_cfg = None
 test_dataloader = None
 test_evaluator = None
+
+
+
+
+
