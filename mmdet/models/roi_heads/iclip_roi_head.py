@@ -157,6 +157,9 @@ class IclipRoIHead(StandardRoIHead):
                                                          (0, 0, 0, batch_size_per_GPU*100 - caption_feat_1_GPU.shape[0])) # 100 means the max collage
         #print(caption_feat_1_GPU.device, 1,caption_feat_1_GPU, gt_per_img)
 
+        if not self.training:
+            return caption_feat_1_GPU, gt_per_img
+
         local_rank = torch.distributed.get_rank()
         world_size = torch.distributed.get_world_size()
         gathered_tensors = [torch.empty_like(pad_caption_feat_1_GPU) for _ in range(world_size)]
