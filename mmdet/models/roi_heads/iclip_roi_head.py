@@ -344,7 +344,7 @@ class IclipRoIHead(StandardRoIHead):
         bbox_results = self._bbox_forward(x, rois, batch_data_samples)
 
         # split batch bbox prediction back to each image
-        cls_scores = bbox_results['cls_score']
+        cls_scores = torch.softmax(bbox_results['cls_score'], dim=1)
         bbox_preds = bbox_results['bbox_pred']
         num_proposals_per_img = tuple(len(p) for p in proposals)
         rois = rois.split(num_proposals_per_img, 0)
