@@ -219,7 +219,7 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
 
         outputs_cls_feat = self.fc_cls(x)
         outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
-        temperature = torch.clip(self.logit_scale.exp(), min=None, max=10.0)
+        temperature = torch.clip(self.logit_scale.exp(), min=None, max=100.0)
         print_log(f'[DEBUG]TEMPERATURE: {temperature}', 'current')
         cls_score = outputs_cls_feat @ caption_feat_all_GPU * temperature
 
