@@ -124,7 +124,17 @@ val_dataloader = dict(
     dataset=val_dataset)
 
 val_cfg = dict(type='ValLoop')
-test_cfg = dict(type='TestLoop')
+test_cfg = dict(
+    type='TestLoop',
+    rcnn=dict(
+        max_per_img=100,
+        nms=dict(iou_threshold=0.5, type='nms'),
+        score_thr=0.05),
+    rpn=dict(
+        max_per_img=1000,
+        min_bbox_size=0,
+        nms=dict(iou_threshold=0.7, type='nms'),
+        nms_pre=1000)),
 val_dataloader = val_dataloader
 test_dataloader = val_dataloader
 
