@@ -125,6 +125,7 @@ val_dataloader = dict(
 
 val_cfg = dict(type='ValLoop')
 test_cfg = dict(
+    type='TestLoop',
     rcnn=dict(
         max_per_img=100,
         nms=dict(iou_threshold=0.5, type='nms'),
@@ -133,7 +134,7 @@ test_cfg = dict(
         max_per_img=1000,
         min_bbox_size=0,
         nms=dict(iou_threshold=0.7, type='nms'),
-        nms_pre=1000)),
+        nms_pre=1000))
 val_dataloader = val_dataloader
 test_dataloader = val_dataloader
 
