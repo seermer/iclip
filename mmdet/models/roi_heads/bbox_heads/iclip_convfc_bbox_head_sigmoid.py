@@ -14,7 +14,7 @@ from mmdet.utils.logger import print_log
 
 
 @MODELS.register_module()
-class IclipConvFCBBoxHead(IclipBBoxHead):
+class IclipConvFCBBoxHeadSigmoid(IclipBBoxHead):
     r"""More general bbox head, with shared conv and fc layers and two optional
     separated branches.
 
@@ -58,6 +58,10 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
         self.fc_out_channels = fc_out_channels
         self.conv_cfg = conv_cfg
         self.norm_cfg = norm_cfg
+
+        # remove background embedding and temperature
+        self.background = None
+        self.logit_scale = None
 
         # add shared convs and fcs
         self.shared_convs, self.shared_fcs, last_layer_dim = \
@@ -177,11 +181,8 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
                     scale levels, each is a 4D-tensor, the channels number \
                     is num_base_priors * 4.
         """
-        background = F.normalize(self.background, dim=1)
         self.num_classes = len(caption_feat_all_GPU)
-        caption_feat_all_GPU = torch.cat((caption_feat_all_GPU, background), dim=0)
         caption_feat_all_GPU = caption_feat_all_GPU.to(torch.float32).T
-        print(caption_feat_all_GPU.min(), caption_feat_all_GPU.max())
 
         # shared part
         if self.num_shared_convs > 0:
@@ -219,17 +220,14 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
             x_reg = self.relu(fc(x_reg))
 
         outputs_cls_feat = self.fc_cls(x)
-        outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
-        temperature = torch.clip(self.logit_scale.exp(), min=None, max=100.0)
-        print_log(f'[DEBUG]TEMPERATURE: {temperature}', 'current')
-        cls_score = outputs_cls_feat @ caption_feat_all_GPU * temperature
+        cls_score = outputs_cls_feat @ caption_feat_all_GPU
 
         bbox_pred = self.fc_reg(x_reg) if self.with_reg else None
         return cls_score, bbox_pred
 
 
 @MODELS.register_module()
-class IclipShared2FCBBoxHead(IclipConvFCBBoxHead):
+class IclipShared2FCBBoxHeadSigmoid(IclipConvFCBBoxHeadSigmoid):
 
     def __init__(self, fc_out_channels: int = 1024, *args, **kwargs) -> None:
         super().__init__(
@@ -245,7 +243,7 @@ class IclipShared2FCBBoxHead(IclipConvFCBBoxHead):
 
 
 @MODELS.register_module()
-class IclipShared4Conv1FCBBoxHead(IclipConvFCBBoxHead):
+class IclipShared4Conv1FCBBoxHeadSigmoid(IclipConvFCBBoxHeadSigmoid):
 
     def __init__(self, fc_out_channels: int = 1024, *args, **kwargs) -> None:
         super().__init__(
