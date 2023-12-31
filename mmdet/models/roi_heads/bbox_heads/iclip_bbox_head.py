@@ -66,10 +66,10 @@ class IclipBBoxHead(BBoxHead):
                   scale levels, each is a 4D-tensor, the channels number
                   is num_base_priors * 4.
         """
-        background = F.normalize(self.background, dim=1)
         self.num_classes = len(caption_feat_all_GPU)
-        caption_feat_all_GPU = torch.cat((caption_feat_all_GPU, background), dim=0)
-        caption_feat_all_GPU = caption_feat_all_GPU.T.to(torch.float32)
+        caption_feat_all_GPU = torch.cat((caption_feat_all_GPU, self.background), dim=0)
+        caption_feat_all_GPU = F.normalize(caption_feat_all_GPU, dim=1)
+        caption_feat_all_GPU = caption_feat_all_GPU.to(torch.float32).T
 
         if self.with_avg_pool:
             if x.numel() > 0:
@@ -82,8 +82,8 @@ class IclipBBoxHead(BBoxHead):
 
         outputs_cls_feat = self.fc_cls(x)
         outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
-        tempurature = torch.clip(self.logit_scale.exp(), min=None, max=100.0)
-        cls_score = outputs_cls_feat @ caption_feat_all_GPU * tempurature
+        temperature = torch.clip(self.logit_scale.exp(), min=None, max=100.0)
+        cls_score = outputs_cls_feat @ caption_feat_all_GPU * temperature
 
         bbox_pred = self.fc_reg(x)
         return cls_score, bbox_pred
