@@ -59,10 +59,6 @@ class IclipConvFCBBoxHeadSigmoid(IclipBBoxHead):
         self.conv_cfg = conv_cfg
         self.norm_cfg = norm_cfg
 
-        # remove background embedding and temperature
-        self.background = None
-        self.logit_scale = None
-
         # add shared convs and fcs
         self.shared_convs, self.shared_fcs, last_layer_dim = \
             self._add_conv_fc_branch(
