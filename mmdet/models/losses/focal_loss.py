@@ -41,6 +41,7 @@ def py_sigmoid_focal_loss(pred,
                     (1 - target)) * pt.pow(gamma)
     loss = F.binary_cross_entropy_with_logits(
         pred, target, reduction='none') * focal_weight
+    print('loss shape', loss.shape)
     if weight is not None:
         if weight.shape != loss.shape:
             if weight.size(0) == loss.size(0):
