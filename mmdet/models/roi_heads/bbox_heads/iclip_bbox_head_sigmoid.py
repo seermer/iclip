@@ -125,9 +125,9 @@ class IclipBBoxHeadSigmoid(BBoxHead):
 
         if cls_score is not None:
             avg_factor = max(torch.sum(label_weights > 0).float().item(), 1.)
+            avg_factor *= self.num_classes
             print_log(f'[DEBUG]AVG_FACTOR, {avg_factor}', 'current')
             if cls_score.numel() > 0:
-                print_log(f'[DEBUG]LOSS_SHAPE {cls_score.shape, labels.shape, label_weights.shape, avg_factor, reduction_override}', 'current')
                 loss_cls_ = self.loss_cls(
                     cls_score,
                     labels,
