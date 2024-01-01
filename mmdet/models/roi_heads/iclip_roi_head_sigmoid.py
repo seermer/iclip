@@ -152,7 +152,7 @@ class IclipRoIHeadSigmoid(StandardRoIHead):
         gt_per_img = [len(_) for _ in caption_feat]
 
         caption_feat_1_GPU = torch.cat(caption_feat, dim=0)
-        caption_feat_1_GPU = torch.nn.functional.normalize(caption_feat_1_GPU, dim=1)
+        # caption_feat_1_GPU = torch.nn.functional.normalize(caption_feat_1_GPU, dim=1)
         pad_caption_feat_1_GPU = torch.nn.functional.pad(caption_feat_1_GPU,
                                                          (0, 0, 0, batch_size_per_GPU*100 - caption_feat_1_GPU.shape[0])) # 100 means the max collage
         #print(caption_feat_1_GPU.device, 1,caption_feat_1_GPU, gt_per_img)
