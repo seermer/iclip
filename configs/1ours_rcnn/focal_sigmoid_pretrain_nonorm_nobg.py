@@ -7,7 +7,7 @@ model = dict(
             type='IclipShared2FCBBoxHeadSigmoid',
             loss_cls=dict(
                 _delete_=True, type='FocalLoss', use_sigmoid=True, gamma=2.0, alpha=0.25,
-                loss_weight=2.0 / 1000.
+                loss_weight=2.0 / 100.
             )
         )
     )
