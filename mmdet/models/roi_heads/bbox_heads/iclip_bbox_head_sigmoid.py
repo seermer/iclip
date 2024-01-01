@@ -44,11 +44,6 @@ class IclipBBoxHeadSigmoid(BBoxHead):
 
         self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
 
-        if bg_embedding == 'random_init':
-            self.background = nn.Parameter(torch.randn(1, self.num_classes), requires_grad=True)
-        else:
-            raise NotImplementedError
-
     def forward(self, x: Tuple[Tensor], caption_feat_all_GPU) -> tuple:
         """Forward features from the upstream network.
 
@@ -66,9 +61,7 @@ class IclipBBoxHeadSigmoid(BBoxHead):
                   scale levels, each is a 4D-tensor, the channels number
                   is num_base_priors * 4.
         """
-        background = F.normalize(self.background, dim=1)
         self.num_classes = len(caption_feat_all_GPU)
-        caption_feat_all_GPU = torch.cat((caption_feat_all_GPU, background), dim=0)
         caption_feat_all_GPU = caption_feat_all_GPU.to(torch.float32).T
 
         if self.with_avg_pool:
@@ -285,8 +278,8 @@ class IclipBBoxHeadSigmoid(BBoxHead):
         if self.custom_cls_channels:
             scores = self.loss_cls.get_activation(cls_score)
         else:
-            scores = F.softmax(
-                cls_score, dim=-1) if cls_score is not None else None
+            scores = F.sigmoid(
+                cls_score) if cls_score is not None else None
 
         img_shape = img_meta['img_shape']
         num_rois = roi.size(0)

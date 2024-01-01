@@ -2,7 +2,6 @@ _base_ = 'base_rcnn_pretrain.py'
 
 model = dict(
     roi_head=dict(
-        type='IclipRoIHeadSigmoid',
         bbox_head=dict(
             type='IclipShared2FCBBoxHeadSigmoid',
             loss_cls=dict(
