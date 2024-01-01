@@ -29,6 +29,7 @@ class IclipBBoxHeadSigmoid(BBoxHead):
     regression respectively."""
 
     def __init__(self,
+                 bg_embedding='random_init',
                  *args,
                  **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -40,6 +41,13 @@ class IclipBBoxHeadSigmoid(BBoxHead):
         cls_predictor_cfg_.update(
             in_features=in_channels, out_features=cls_channels)
         self.fc_cls = MODELS.build(cls_predictor_cfg_)
+
+        self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
+
+        if bg_embedding == 'random_init':
+            self.background = nn.Parameter(torch.randn(1, self.num_classes), requires_grad=True)
+        else:
+            raise NotImplementedError
 
     def forward(self, x: Tuple[Tensor], caption_feat_all_GPU) -> tuple:
         """Forward features from the upstream network.
@@ -58,7 +66,9 @@ class IclipBBoxHeadSigmoid(BBoxHead):
                   scale levels, each is a 4D-tensor, the channels number
                   is num_base_priors * 4.
         """
+        background = F.normalize(self.background, dim=1)
         self.num_classes = len(caption_feat_all_GPU)
+        caption_feat_all_GPU = torch.cat((caption_feat_all_GPU, background), dim=0)
         caption_feat_all_GPU = caption_feat_all_GPU.to(torch.float32).T
 
         if self.with_avg_pool:
@@ -71,7 +81,9 @@ class IclipBBoxHeadSigmoid(BBoxHead):
                 x = torch.mean(x, dim=(-1, -2))
 
         outputs_cls_feat = self.fc_cls(x)
-        cls_score = outputs_cls_feat @ caption_feat_all_GPU
+        outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
+        temperature = torch.clip(self.logit_scale.exp(), min=None, max=100.0)
+        cls_score = outputs_cls_feat @ caption_feat_all_GPU * temperature
 
         bbox_pred = self.fc_reg(x)
         return cls_score, bbox_pred
@@ -273,8 +285,8 @@ class IclipBBoxHeadSigmoid(BBoxHead):
         if self.custom_cls_channels:
             scores = self.loss_cls.get_activation(cls_score)
         else:
-            scores = F.sigmoid(
-                cls_score) if cls_score is not None else None
+            scores = F.softmax(
+                cls_score, dim=-1) if cls_score is not None else None
 
         img_shape = img_meta['img_shape']
         num_rois = roi.size(0)

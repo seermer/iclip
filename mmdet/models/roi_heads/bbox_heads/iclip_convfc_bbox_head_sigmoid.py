@@ -177,7 +177,9 @@ class IclipConvFCBBoxHeadSigmoid(IclipBBoxHeadSigmoid):
                     scale levels, each is a 4D-tensor, the channels number \
                     is num_base_priors * 4.
         """
+        background = self.background
         self.num_classes = len(caption_feat_all_GPU)
+        caption_feat_all_GPU = torch.cat((caption_feat_all_GPU, background), dim=0)
         caption_feat_all_GPU = caption_feat_all_GPU.to(torch.float32).T
 
         # shared part
@@ -216,7 +218,10 @@ class IclipConvFCBBoxHeadSigmoid(IclipBBoxHeadSigmoid):
             x_reg = self.relu(fc(x_reg))
 
         outputs_cls_feat = self.fc_cls(x)
-        cls_score = outputs_cls_feat @ caption_feat_all_GPU
+        # outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
+        temperature = torch.clip(self.logit_scale.exp(), min=None, max=100.0)
+        print_log(f'[DEBUG]TEMPERATURE: {temperature}', 'current')
+        cls_score = outputs_cls_feat @ caption_feat_all_GPU * temperature
 
         bbox_pred = self.fc_reg(x_reg) if self.with_reg else None
         return cls_score, bbox_pred
