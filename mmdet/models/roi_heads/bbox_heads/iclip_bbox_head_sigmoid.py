@@ -24,7 +24,7 @@ import numpy as np
 
 
 @MODELS.register_module()
-class IclipBBoxHead(BBoxHead):
+class IclipBBoxHeadSigmoid(BBoxHead):
     """Simplest RoI head, with only two fc layers for classification and
     regression respectively."""
 

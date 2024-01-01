@@ -9,12 +9,12 @@ from mmengine.config import ConfigDict
 from torch import Tensor
 
 from mmdet.registry import MODELS
-from .iclip_bbox_head import IclipBBoxHead
+from .iclip_bbox_head_sigmoid import IclipBBoxHeadSigmoid
 from mmdet.utils.logger import print_log
 
 
 @MODELS.register_module()
-class IclipConvFCBBoxHeadSigmoid(IclipBBoxHead):
+class IclipConvFCBBoxHeadSigmoid(IclipBBoxHeadSigmoid):
     r"""More general bbox head, with shared conv and fc layers and two optional
     separated branches.
 

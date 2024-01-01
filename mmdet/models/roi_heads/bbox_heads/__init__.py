@@ -8,11 +8,15 @@ from .multi_instance_bbox_head import MultiInstanceBBoxHead
 from .sabl_head import SABLHead
 from .scnet_bbox_head import SCNetBBoxHead
 from .iclip_bbox_head import IclipBBoxHead
+from .iclip_bbox_head_sigmoid import IclipBBoxHeadSigmoid
 from .iclip_convfc_bbox_head import IclipShared4Conv1FCBBoxHead, IclipShared2FCBBoxHead, IclipConvFCBBoxHead
+from .iclip_convfc_bbox_head_sigmoid import (IclipShared4Conv1FCBBoxHeadSigmoid, IclipShared2FCBBoxHeadSigmoid,
+                                             IclipConvFCBBoxHeadSigmoid)
 
 __all__ = [
     'BBoxHead', 'ConvFCBBoxHead', 'Shared2FCBBoxHead',
     'Shared4Conv1FCBBoxHead', 'DoubleConvFCBBoxHead', 'SABLHead', 'DIIHead',
     'SCNetBBoxHead', 'MultiInstanceBBoxHead',
-    'IclipBBoxHead', 'IclipShared4Conv1FCBBoxHead', 'IclipShared2FCBBoxHead', 'IclipConvFCBBoxHead'
+    'IclipBBoxHead', 'IclipShared4Conv1FCBBoxHead', 'IclipShared2FCBBoxHead', 'IclipConvFCBBoxHead',
+    'IclipShared4Conv1FCBBoxHeadSigmoid', 'IclipShared2FCBBoxHeadSigmoid', 'IclipConvFCBBoxHeadSigmoid'
 ]
