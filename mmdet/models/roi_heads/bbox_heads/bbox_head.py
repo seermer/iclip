@@ -320,6 +320,7 @@ class BBoxHead(BaseModule):
 
         cls_reg_targets = self.get_targets(
             sampling_results, rcnn_train_cfg, concat=concat)
+        print(f'SHAPE: {cls_score.shape, bbox_pred.shape, reduction_override}')
         losses = self.loss(
             cls_score,
             bbox_pred,

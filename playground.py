@@ -1,13 +1,14 @@
+from mmdet.models.losses import FocalLoss
 import torch
 
-x = torch.rand((3, 8), dtype=torch.float32) * 120 - 60
-labels = torch.randint(0, 7, (3, 1))
-labels_onehot = torch.zeros_like(x).scatter_(1, labels, 1)
-print(labels)
-print(labels_onehot)
+loss_fn = FocalLoss().to('cuda')
+loss_fn2 = torch.nn.CrossEntropyLoss().to('cuda')
 
-ce = torch.nn.CrossEntropyLoss()
-bce = torch.nn.BCEWithLogitsLoss()
+x = torch.rand((4, 8)).to('cuda') * 60 - 30
+label = torch.randint(0, 8, (4,), dtype=torch.long).to('cuda')
 
-print(ce(x, labels.squeeze()))
-print(bce(x, labels_onehot))
+print(loss_fn(x, label))
+print(loss_fn2(x, label))
+
+
+
