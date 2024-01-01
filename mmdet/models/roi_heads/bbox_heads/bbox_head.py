@@ -320,7 +320,6 @@ class BBoxHead(BaseModule):
 
         cls_reg_targets = self.get_targets(
             sampling_results, rcnn_train_cfg, concat=concat)
-        print(f'SHAPE: {cls_score.shape, bbox_pred.shape, reduction_override}')
         losses = self.loss(
             cls_score,
             bbox_pred,
@@ -376,6 +375,7 @@ class BBoxHead(BaseModule):
         if cls_score is not None:
             avg_factor = max(torch.sum(label_weights > 0).float().item(), 1.)
             if cls_score.numel() > 0:
+                print(f'LOSS {cls_score.shape, labels.shape, label_weights.shape, avg_factor, reduction_override}')
                 loss_cls_ = self.loss_cls(
                     cls_score,
                     labels,
