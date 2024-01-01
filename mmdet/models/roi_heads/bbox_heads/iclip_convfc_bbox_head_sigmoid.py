@@ -220,7 +220,7 @@ class IclipConvFCBBoxHeadSigmoid(IclipBBoxHeadSigmoid):
         # temperature = torch.clip(self.logit_scale.exp(), min=None, max=100.0)
         # print_log(f'[DEBUG]TEMPERATURE: {temperature}', 'current')
         cls_score = outputs_cls_feat @ caption_feat_all_GPU  # * temperature
-        print_log(f'[DEBUG]CLS_SCORE: {(cls_score.min(), cls_score.max())}', 'current')
+        print_log(f'[DEBUG]CLS_SCORE: {(cls_score.min(), cls_score.max(), cls_score[:5][:5])}', 'current')
 
         bbox_pred = self.fc_reg(x_reg) if self.with_reg else None
         return cls_score, bbox_pred
