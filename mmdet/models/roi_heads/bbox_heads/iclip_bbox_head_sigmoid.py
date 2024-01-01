@@ -42,7 +42,7 @@ class IclipBBoxHeadSigmoid(BBoxHead):
             in_features=in_channels, out_features=cls_channels)
         self.fc_cls = MODELS.build(cls_predictor_cfg_)
 
-        self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
+        # self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
 
     def forward(self, x: Tuple[Tensor], caption_feat_all_GPU) -> tuple:
         """Forward features from the upstream network.
@@ -74,9 +74,9 @@ class IclipBBoxHeadSigmoid(BBoxHead):
                 x = torch.mean(x, dim=(-1, -2))
 
         outputs_cls_feat = self.fc_cls(x)
-        outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
-        temperature = torch.clip(self.logit_scale.exp(), min=None, max=100.0)
-        cls_score = outputs_cls_feat @ caption_feat_all_GPU * temperature
+        # outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
+        # temperature = torch.clip(self.logit_scale.exp(), min=None, max=100.0)
+        cls_score = outputs_cls_feat @ caption_feat_all_GPU  # * temperature
 
         bbox_pred = self.fc_reg(x)
         return cls_score, bbox_pred

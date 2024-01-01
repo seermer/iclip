@@ -216,10 +216,10 @@ class IclipConvFCBBoxHeadSigmoid(IclipBBoxHeadSigmoid):
             x_reg = self.relu(fc(x_reg))
 
         outputs_cls_feat = self.fc_cls(x)
-        outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
-        temperature = torch.clip(self.logit_scale.exp(), min=None, max=100.0)
-        print_log(f'[DEBUG]TEMPERATURE: {temperature}', 'current')
-        cls_score = outputs_cls_feat @ caption_feat_all_GPU * temperature
+        # outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
+        # temperature = torch.clip(self.logit_scale.exp(), min=None, max=100.0)
+        # print_log(f'[DEBUG]TEMPERATURE: {temperature}', 'current')
+        cls_score = outputs_cls_feat @ caption_feat_all_GPU  # * temperature
 
         bbox_pred = self.fc_reg(x_reg) if self.with_reg else None
         return cls_score, bbox_pred
