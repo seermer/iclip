@@ -6,14 +6,15 @@ data_root = '/media/Auriga/fangyic/yfcc15m/'
 img_scale = (1024, 1024)  # width, height
 
 val_pipeline = [
-    dict(type='Collage', img_scale=img_scale, grid_range=(5, 18), mode='rescalecentercrop'),
-    dict(type='RandomChoiceResize',
+    dict(_delete_=True, type='Collage', img_scale=img_scale, grid_range=(5, 18), mode='rescalecentercrop'),
+    dict(_delete_=True, type='RandomChoiceResize',
          scales=[(2048, 2048)],
          keep_ratio=True),
-    dict(type='PackDetInputs', meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape', 'scale_factor'))
+    dict(_delete_=True, type='PackDetInputs', meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape', 'scale_factor'))
 ]
 val_dataset = dict(
     # use MultiImageMixDataset wrapper to support mosaic and mixup
+    _delete_=True,
     type='MultiImageMixDataset',
     dataset=dict(
         type=dataset_type,
@@ -30,18 +31,20 @@ val_dataset = dict(
         backend_args=None),
     pipeline=val_pipeline)
 val_dataloader = dict(
+    _delete_=True,
     batch_size=1,
     num_workers=2,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=False),
     dataset=val_dataset)
 
-val_cfg = dict(type='ValLoop')
-test_cfg = dict(type='TestLoop')
+val_cfg = dict(_delete_=True, type='ValLoop')
+test_cfg = dict(_delete_=True, type='TestLoop')
 val_dataloader = val_dataloader
 test_dataloader = val_dataloader
 
 val_evaluator = dict(
+    _delete_=True,
     type='IclipMetric',
     ann_file=None,
     metric='bbox',
