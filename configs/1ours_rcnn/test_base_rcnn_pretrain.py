@@ -7,6 +7,7 @@ img_scale = (1024, 1024)  # width, height
 
 model = dict(
     test_cfg=dict(
+        _delete_=True, type='TestLoop',
         rpn=dict(
             nms_across_levels=False,
             nms_pre=1000,
@@ -53,7 +54,7 @@ val_dataloader = dict(
     dataset=val_dataset)
 
 val_cfg = dict(_delete_=True, type='ValLoop')
-test_cfg = dict(_delete_=True, type='TestLoop')
+# test_cfg = dict()
 val_dataloader = val_dataloader
 test_dataloader = val_dataloader
 
