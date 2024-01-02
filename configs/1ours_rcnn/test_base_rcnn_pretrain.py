@@ -7,7 +7,6 @@ img_scale = (1024, 1024)  # width, height
 
 model = dict(
     test_cfg=dict(
-        _delete_=True, type='TestLoop',
         rpn=dict(
             nms_across_levels=False,
             nms_pre=1000,
@@ -17,7 +16,7 @@ model = dict(
             min_bbox_size=0),
         rcnn=dict(
             score_thr=0.05,
-            nms=dict(type='nms', iou_threshold=0.5),
+            nms=dict(type='nms', iou_threshold=0.5, class_agnostic=True),
             max_per_img=100))
 )
 
@@ -54,7 +53,7 @@ val_dataloader = dict(
     dataset=val_dataset)
 
 val_cfg = dict(_delete_=True, type='ValLoop')
-# test_cfg = dict()
+test_cfg = dict(_delete_=True, type='TestLoop')
 val_dataloader = val_dataloader
 test_dataloader = val_dataloader
 
