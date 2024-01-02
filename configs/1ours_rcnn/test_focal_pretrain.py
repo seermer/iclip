@@ -5,10 +5,25 @@ data_root = '/media/Auriga/fangyic/yfcc15m/'
 
 img_scale = (1024, 1024)  # width, height
 
+model = dict(
+    test_cfg=dict(
+        rpn=dict(
+            nms_across_levels=False,
+            nms_pre=1000,
+            nms_post=1000,
+            max_num=1000,
+            nms_thr=0.7,
+            min_bbox_size=0),
+        rcnn=dict(
+            score_thr=0.01,
+            nms=dict(type='nms', iou_threshold=0.5),
+            max_per_img=1000))
+)
+
 val_pipeline = [
-    dict(type='Collage', img_scale=img_scale, grid_range=(5, 18), mode='rescalecentercrop'),
+    dict(type='Collage', img_scale=img_scale, grid_range=(2, 9), mode='rescalecentercrop'),
     dict(type='RandomChoiceResize',
-         scales=[(2048, 2048)],
+         scales=[img_scale],
          keep_ratio=True),
     dict(type='PackDetInputs', meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape', 'scale_factor'))
 ]
