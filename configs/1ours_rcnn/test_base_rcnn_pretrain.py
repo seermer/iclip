@@ -14,7 +14,6 @@ val_pipeline = [
 ]
 val_dataset = dict(
     # use MultiImageMixDataset wrapper to support mosaic and mixup
-    _delete_=True,
     type='MultiImageMixDataset',
     dataset=dict(
         type=dataset_type,
