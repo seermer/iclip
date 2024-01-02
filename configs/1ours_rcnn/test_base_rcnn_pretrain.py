@@ -6,11 +6,11 @@ data_root = '/media/Auriga/fangyic/yfcc15m/'
 img_scale = (1024, 1024)  # width, height
 
 val_pipeline = [
-    dict(_delete_=True, type='Collage', img_scale=img_scale, grid_range=(5, 18), mode='rescalecentercrop'),
-    dict(_delete_=True, type='RandomChoiceResize',
+    dict(type='Collage', img_scale=img_scale, grid_range=(5, 18), mode='rescalecentercrop'),
+    dict(type='RandomChoiceResize',
          scales=[(2048, 2048)],
          keep_ratio=True),
-    dict(_delete_=True, type='PackDetInputs', meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape', 'scale_factor'))
+    dict(type='PackDetInputs', meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape', 'scale_factor'))
 ]
 val_dataset = dict(
     # use MultiImageMixDataset wrapper to support mosaic and mixup
