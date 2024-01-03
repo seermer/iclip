@@ -77,7 +77,7 @@ param_scheduler = [
         begin=0,
         end=max_iters,
         by_epoch=False,
-        milestones=[max_iters // 5 * 4],
+        milestones=[max_iters // 12 * 8, max_iters // 12 * 11],
         gamma=0.1)]
 
 train_cfg = dict(
