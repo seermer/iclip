@@ -144,9 +144,12 @@ class IclipBBoxHead(BBoxHead):
                     losses.update(loss_cls_)
                 else:
                     losses['loss_cls'] = loss_cls_
-                print_log(cls_score.max(-1)[:10], 'current')
-                print_log(cls_score.argmax(-1)[:10], 'current')
+
+                max_val, argmax = cls_score.max(-1)
+                print_log(max_val[:10], 'current')
+                print_log(argmax[:10], 'current')
                 print_log(labels[:10], 'current')
+                print_log(cls_score[labels[:10]], 'current')
                 if self.custom_activation:
                     acc_ = self.loss_cls.get_accuracy(cls_score, labels)
                     losses.update(acc_)
