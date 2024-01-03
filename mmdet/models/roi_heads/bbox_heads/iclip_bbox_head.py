@@ -134,13 +134,12 @@ class IclipBBoxHead(BBoxHead):
             avg_factor = max(torch.sum(label_weights > 0).float().item(), 1.)
             print_log(f'[DEBUG]AVG_FACTOR, {avg_factor}', 'current')
             if cls_score.numel() > 0:
-                # loss_cls_ = self.loss_cls(
-                #     cls_score,
-                #     labels,
-                #     label_weights,
-                #     avg_factor=avg_factor,
-                #     reduction_override=reduction_override)
-                loss_cls_ = F.cross_entropy(cls_score, labels)
+                loss_cls_ = self.loss_cls(
+                    cls_score,
+                    labels,
+                    label_weights,
+                    avg_factor=avg_factor,
+                    reduction_override=reduction_override)
                 if isinstance(loss_cls_, dict):
                     losses.update(loss_cls_)
                 else:
@@ -151,12 +150,12 @@ class IclipBBoxHead(BBoxHead):
                 print_log(argmax[:10], 'current')
                 print_log(labels[:10], 'current')
                 print_log(cls_score[np.arange(10), labels[:10]], 'current')
+                print_log(labels.max(), 'current')
                 if self.custom_activation:
                     acc_ = self.loss_cls.get_accuracy(cls_score, labels)
                     losses.update(acc_)
                 else:
-                    # losses['acc'] = accuracy(cls_score, labels)
-                    losses['acc'] = (argmax == labels).sum().to(torch.float32)
+                    losses['acc'] = accuracy(cls_score, labels)
         if bbox_pred is not None:
             bg_class_ind = self.num_classes
             # 0~self.num_classes-1 are FG, self.num_classes is BG
