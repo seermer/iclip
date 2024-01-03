@@ -140,7 +140,7 @@ class IclipBBoxHead(BBoxHead):
                 #     label_weights,
                 #     avg_factor=avg_factor,
                 #     reduction_override=reduction_override)
-                loss_cls_ = F.cross_entropy(cls_score, labels, label_smoothing=0.1)
+                loss_cls_ = F.cross_entropy(cls_score, labels)
                 if isinstance(loss_cls_, dict):
                     losses.update(loss_cls_)
                 else:
