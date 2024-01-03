@@ -155,7 +155,8 @@ class IclipBBoxHead(BBoxHead):
                     acc_ = self.loss_cls.get_accuracy(cls_score, labels)
                     losses.update(acc_)
                 else:
-                    losses['acc'] = accuracy(cls_score, labels)
+                    # losses['acc'] = accuracy(cls_score, labels)
+                    losses['acc'] = (argmax == labels).sum()
         if bbox_pred is not None:
             bg_class_ind = self.num_classes
             # 0~self.num_classes-1 are FG, self.num_classes is BG
