@@ -271,7 +271,7 @@ class FocalLoss(nn.Module):
                         weight = weight.view(loss.size(0), -1)
                 assert weight.ndim == loss.ndim
 
-            loss_cls = weight_reduce_loss(loss, weight, reduction, avg_factor)
+            loss_cls = self.loss_weight * weight_reduce_loss(loss, weight, reduction, avg_factor)
 
         return loss_cls
 
