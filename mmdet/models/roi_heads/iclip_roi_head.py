@@ -128,6 +128,7 @@ class IclipRoIHead(StandardRoIHead):
         caption_feat = []
         idx_wrapper = 0
         for data_sample in batch_data_samples:
+            print_log(f"LABELS {data_sample.gt_instances['labels'].max(), len(data_sample.gt_instances['labels'], idx_wrapper)}", 'current')
             data_sample.gt_instances['labels'] += idx_wrapper  # align the pseudo label with caption idx
             idx_wrapper += len(data_sample.gt_instances['capfeats'])
             caption_feat.append(data_sample.gt_instances['capfeats'])
