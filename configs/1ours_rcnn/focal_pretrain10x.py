@@ -4,12 +4,7 @@ model = dict(
     roi_head=dict(
         bbox_head=dict(
             loss_cls=dict(
-                _delete_=True, type='FocalLoss', use_sigmoid=False, gamma=2.0, alpha=0.25, loss_weight=2.0)
+                _delete_=True, type='FocalLoss', use_sigmoid=False, gamma=2.0, alpha=0.25, loss_weight=20.0)
         )
     )
 )
-
-optim_wrapper = dict(
-    _delete_=True,
-    type='OptimWrapper',
-    optimizer=dict(type='SGD', lr=0.1, momentum=0.9, weight_decay=0.0001))
