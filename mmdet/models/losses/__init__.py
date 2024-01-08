@@ -1,5 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
-from .accuracy import Accuracy, accuracy
+from .accuracy import Accuracy, accuracy, iclip_accuracy
 from .ae_loss import AssociativeEmbeddingLoss
 from .balanced_l1_loss import BalancedL1Loss, balanced_l1_loss
 from .cross_entropy_loss import (CrossEntropyLoss, binary_cross_entropy,
@@ -35,5 +35,6 @@ __all__ = [
     'carl_loss', 'AssociativeEmbeddingLoss', 'GaussianFocalLoss',
     'QualityFocalLoss', 'DistributionFocalLoss', 'VarifocalLoss',
     'KnowledgeDistillationKLDivLoss', 'SeesawLoss', 'DiceLoss', 'EQLV2Loss',
-    'MarginL2Loss', 'MultiPosCrossEntropyLoss', 'L2Loss', 'TripletLoss'
+    'MarginL2Loss', 'MultiPosCrossEntropyLoss', 'L2Loss', 'TripletLoss',
+    'iclip_accuracy'
 ]

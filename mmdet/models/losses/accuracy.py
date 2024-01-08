@@ -2,6 +2,34 @@
 import torch.nn as nn
 
 
+def iclip_accuracy(pred, target, topk=1, thresh=None, ignore_index=-1):
+    """Calculate accuracy according to the prediction and target.
+
+    Args:
+        pred (torch.Tensor): The model prediction, shape (N, num_class)
+        target (torch.Tensor): The target of each prediction, shape (N, )
+        topk (int | tuple[int], optional): If the predictions in ``topk``
+            matches the target, the predictions will be regarded as
+            correct ones. Defaults to 1.
+        thresh (float, optional): If not None, predictions with scores under
+            this threshold are considered incorrect. Default to None.
+
+    Returns:
+        float | tuple[float]: If the input ``topk`` is a single integer,
+            the function will return a single float as accuracy. If
+            ``topk`` is a tuple containing multiple integers, the
+            function will return a tuple containing accuracies of
+            each ``topk`` number.
+    """
+    if ignore_index >= 0:
+        kept = target != ignore_index
+        pred = pred[kept]
+        target = target[kept]
+    return accuracy(pred, target, topk=topk, thresh=thresh)
+
+
+
+
 def accuracy(pred, target, topk=1, thresh=None):
     """Calculate accuracy according to the prediction and target.
 
