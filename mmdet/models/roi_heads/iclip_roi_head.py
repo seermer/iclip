@@ -73,6 +73,11 @@ class IclipRoIHead(StandardRoIHead):
             dict[str, Tensor]: A dictionary of loss components
         """
         assert len(rpn_results_list) == len(batch_data_samples)
+        idx_wrapper = 0
+        for data_sample in batch_data_samples:
+            data_sample.gt_instances['labels'] += idx_wrapper  # align the pseudo label with caption idx
+            idx_wrapper += len(data_sample.gt_instances['capfeats'])
+
         outputs = unpack_gt_instances(batch_data_samples)
         batch_gt_instances, batch_gt_instances_ignore, _ = outputs
 
@@ -128,8 +133,8 @@ class IclipRoIHead(StandardRoIHead):
         caption_feat = []
         idx_wrapper = 0
         for data_sample in batch_data_samples:
-            data_sample.gt_instances['labels'] += idx_wrapper  # align the pseudo label with caption idx
-            idx_wrapper += len(data_sample.gt_instances['capfeats'])
+            # data_sample.gt_instances['labels'] += idx_wrapper  # align the pseudo label with caption idx
+            # idx_wrapper += len(data_sample.gt_instances['capfeats'])
             caption_feat.append(data_sample.gt_instances['capfeats'])
         caption_feat_all_GPU, gt_per_img = self.gather_all_capfeat(caption_feat)
 
