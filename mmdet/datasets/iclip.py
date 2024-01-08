@@ -31,8 +31,11 @@ class IclipDataset(BaseDataset):
                 'img_path': file_backend.join_path(img_prefix, ann['image']),
                 'gt_caption': ann['caption'],
             }
+            if not (Path(self.data_root) / ann['image']).exists():
+                continue
 
             data_list.append(data_info)
+        print(len(data_list))
 
         return data_list
 
