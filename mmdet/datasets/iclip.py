@@ -26,8 +26,8 @@ class IclipDataset(BaseDataset):
 
         data_list = []
         for ann in annotations:
-            if not (Path(self.data_root) / ann['image']).exists():
-                continue
+            # if not (Path(self.data_root) / ann['image']).exists():
+            #     continue
 
             data_info = {
                 'img_id': Path(ann['image']).stem.split('_')[-1],
@@ -36,7 +36,6 @@ class IclipDataset(BaseDataset):
             }
 
             data_list.append(data_info)
-        print(len(data_list))
 
         return data_list
 
