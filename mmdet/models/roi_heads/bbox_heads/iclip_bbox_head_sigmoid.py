@@ -11,7 +11,7 @@ from torch import Tensor
 from torch.nn.modules.utils import _pair
 
 from mmdet.models.layers import multiclass_nms
-from mmdet.models.losses import accuracy
+from mmdet.models.losses import accuracy, iclip_accuracy
 from mmdet.models.task_modules.samplers import SamplingResult
 from mmdet.models.utils import empty_instances, multi_apply
 from mmdet.registry import MODELS, TASK_UTILS
@@ -141,7 +141,7 @@ class IclipBBoxHeadSigmoid(BBoxHead):
                     acc_ = self.loss_cls.get_accuracy(cls_score, labels)
                     losses.update(acc_)
                 else:
-                    losses['acc'] = accuracy(cls_score, labels)
+                    losses['acc'] = iclip_accuracy(cls_score, labels, ignore_index=self.num_classes)
         if bbox_pred is not None:
             bg_class_ind = self.num_classes
             # 0~self.num_classes-1 are FG, self.num_classes is BG
