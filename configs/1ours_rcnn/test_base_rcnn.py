@@ -1,4 +1,4 @@
-_base_ = 'focal_pretrain.py'
+_base_ = 'base_rcnn_pretrain.py'
 
 dataset_type = 'IclipDataset'
 data_root = '/media/Auriga/fangyic/yfcc15m/'
@@ -21,7 +21,7 @@ model = dict(
 )
 
 val_pipeline = [
-    dict(type='Collage', img_scale=img_scale, grid_range=(2, 9), mode='rescalecentercrop'),
+    dict(type='Collage', img_scale=img_scale, grid_range=(2, 10), mode='rescalecentercrop'),
     dict(type='RandomChoiceResize',
          scales=[img_scale],
          keep_ratio=True),
