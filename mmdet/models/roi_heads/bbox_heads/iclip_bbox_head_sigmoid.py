@@ -29,7 +29,6 @@ class IclipBBoxHeadSigmoid(BBoxHead):
     regression respectively."""
 
     def __init__(self,
-                 bg_embedding='random_init',
                  *args,
                  **kwargs) -> None:
         super().__init__(*args, **kwargs)
