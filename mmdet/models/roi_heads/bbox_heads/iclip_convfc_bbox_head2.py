@@ -1,4 +1,3 @@
-# Copyright (c) OpenMMLab. All rights reserved.
 from typing import Optional, Tuple, Union
 
 import torch
@@ -14,7 +13,7 @@ from mmdet.utils.logger import print_log
 
 
 @MODELS.register_module()
-class IclipConvFCBBoxHead(IclipBBoxHead):
+class ConvFCBBoxHead(IclipBBoxHead):
     r"""More general bbox head, with shared conv and fc layers and two optional
     separated branches.
 
@@ -26,20 +25,21 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
     """  # noqa: W605
 
     def __init__(self,
-                 num_shared_convs: int = 0,
-                 num_shared_fcs: int = 0,
-                 num_cls_convs: int = 0,
-                 num_cls_fcs: int = 0,
-                 num_reg_convs: int = 0,
-                 num_reg_fcs: int = 0,
-                 conv_out_channels: int = 256,
-                 fc_out_channels: int = 1024,
-                 conv_cfg: Optional[Union[dict, ConfigDict]] = None,
-                 norm_cfg: Optional[Union[dict, ConfigDict]] = None,
+                 num_shared_convs=0,
+                 num_shared_fcs=0,
+                 num_cls_convs=0,
+                 num_cls_fcs=0,
+                 num_reg_convs=0,
+                 num_reg_fcs=0,
+                 conv_out_channels=256,
+                 fc_out_channels=1024,
+                 conv_cfg=None,
+                 norm_cfg=None,
                  init_cfg: Optional[Union[dict, ConfigDict]] = None,
+                 ensemble=False,
                  *args,
-                 **kwargs) -> None:
-        super().__init__(*args, init_cfg=init_cfg, **kwargs)
+                 **kwargs):
+        super(ConvFCBBoxHead, self).__init__(*args, init_cfg=init_cfg, **kwargs)
         assert (num_shared_convs + num_shared_fcs + num_cls_convs +
                 num_cls_fcs + num_reg_convs + num_reg_fcs > 0)
         if num_cls_convs > 0 or num_reg_convs > 0:
@@ -64,6 +64,9 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
             self._add_conv_fc_branch(
                 self.num_shared_convs, self.num_shared_fcs, self.in_channels,
                 True)
+        if ensemble:
+            pass
+
         self.shared_out_channels = last_layer_dim
 
         # add cls specific branch
@@ -84,12 +87,6 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
 
         self.relu = nn.ReLU(inplace=True)
         # reconstruct fc_cls and fc_reg since input channels are changed
-        if self.with_cls:
-            cls_channels = self.num_classes
-            cls_predictor_cfg_ = self.cls_predictor_cfg.copy()
-            cls_predictor_cfg_.update(
-                in_features=self.cls_last_dim, out_features=cls_channels)
-            self.fc_cls = MODELS.build(cls_predictor_cfg_)
         if self.with_reg:
             box_dim = self.bbox_coder.encode_size
             out_dim_reg = box_dim if self.reg_class_agnostic else \
@@ -120,10 +117,10 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
             ]
 
     def _add_conv_fc_branch(self,
-                            num_branch_convs: int,
-                            num_branch_fcs: int,
-                            in_channels: int,
-                            is_shared: bool = False) -> tuple:
+                            num_branch_convs,
+                            num_branch_fcs,
+                            in_channels,
+                            is_shared=False):
         """Add shared or separable branch.
 
         convs -> avg pool (optional) -> fcs
@@ -149,8 +146,7 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
         if num_branch_fcs > 0:
             # for shared branch, only consider self.with_avg_pool
             # for separated branches, also consider self.num_shared_fcs
-            if (is_shared
-                    or self.num_shared_fcs == 0) and not self.with_avg_pool:
+            if (is_shared or self.num_shared_fcs == 0) and not self.with_avg_pool:
                 last_layer_dim *= self.roi_feat_area
             for i in range(num_branch_fcs):
                 fc_in_channels = (
@@ -160,13 +156,16 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
             last_layer_dim = self.fc_out_channels
         return branch_convs, branch_fcs, last_layer_dim
 
-    def forward(self, x: Tuple[Tensor], caption_feat_all_GPU) -> tuple:
-        background = F.normalize(self.background, dim=1)
-        self.num_classes = len(caption_feat_all_GPU)
-        caption_feat_all_GPU = torch.cat((caption_feat_all_GPU, background), dim=0)
-        caption_feat_all_GPU = caption_feat_all_GPU.to(torch.float32).T
+    def init_weights(self):
+        super(ConvFCBBoxHead, self).init_weights()
+        # conv layers are already initialized by ConvModule
+        for module_list in [self.shared_fcs, self.cls_fcs, self.reg_fcs]:
+            for m in module_list.modules():
+                if isinstance(m, nn.Linear):
+                    nn.init.xavier_uniform_(m.weight)
+                    nn.init.constant_(m.bias, 0)
 
-        # shared part
+    def forward_embedding(self, x):
         if self.num_shared_convs > 0:
             for conv in self.shared_convs:
                 x = conv(x)
@@ -179,18 +178,10 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
 
             for fc in self.shared_fcs:
                 x = self.relu(fc(x))
-        # separate branches
-        x_cls = x
-        x_reg = x
+        return x
 
-        for conv in self.cls_convs:
-            x_cls = conv(x_cls)
-        if x_cls.dim() > 2:
-            if self.with_avg_pool:
-                x_cls = self.avg_pool(x_cls)
-            x_cls = x_cls.flatten(1)
-        for fc in self.cls_fcs:
-            x_cls = self.relu(fc(x_cls))
+    def forward(self, x):
+        x_reg = x
 
         for conv in self.reg_convs:
             x_reg = conv(x_reg)
@@ -201,21 +192,15 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
         for fc in self.reg_fcs:
             x_reg = self.relu(fc(x_reg))
 
-        outputs_cls_feat = self.fc_cls(x)
-        outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
-        temperature = torch.clip(self.logit_scale.exp(), min=None, max=100.0)
-        print_log(f'[DEBUG]TEMPERATURE: {temperature}', 'current')
-        cls_score = outputs_cls_feat @ caption_feat_all_GPU * temperature
-
         bbox_pred = self.fc_reg(x_reg) if self.with_reg else None
-        return cls_score, bbox_pred
+        return bbox_pred
 
 
 @MODELS.register_module()
-class IclipShared2FCBBoxHead(IclipConvFCBBoxHead):
+class IclipShared2FCBBoxHead2(ConvFCBBoxHead):
 
-    def __init__(self, fc_out_channels: int = 1024, *args, **kwargs) -> None:
-        super().__init__(
+    def __init__(self, fc_out_channels=1024, *args, **kwargs):
+        super(IclipShared2FCBBoxHead2, self).__init__(
             num_shared_convs=0,
             num_shared_fcs=2,
             num_cls_convs=0,
@@ -228,10 +213,10 @@ class IclipShared2FCBBoxHead(IclipConvFCBBoxHead):
 
 
 @MODELS.register_module()
-class IclipShared4Conv1FCBBoxHead(IclipConvFCBBoxHead):
+class IclipShared4Conv1FCBBoxHead2(ConvFCBBoxHead):
 
-    def __init__(self, fc_out_channels: int = 1024, *args, **kwargs) -> None:
-        super().__init__(
+    def __init__(self, fc_out_channels=1024, *args, **kwargs):
+        super(IclipShared4Conv1FCBBoxHead2, self).__init__(
             num_shared_convs=4,
             num_shared_fcs=1,
             num_cls_convs=0,

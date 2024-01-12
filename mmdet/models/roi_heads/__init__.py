@@ -27,6 +27,8 @@ from .trident_roi_head import TridentRoIHead
 from .iclip_roi_head import IclipRoIHead
 from .iclip_roi_head_sigmoid import IclipRoIHeadSigmoid
 
+from .iclip_roi_head2 import IclipRoIHead2
+
 __all__ = [
     'BaseRoIHead', 'CascadeRoIHead', 'DoubleHeadRoIHead', 'MaskScoringRoIHead',
     'HybridTaskCascadeRoIHead', 'GridRoIHead', 'ResLayer', 'BBoxHead',
@@ -38,5 +40,6 @@ __all__ = [
     'CoarseMaskHead', 'DynamicRoIHead', 'SparseRoIHead', 'TridentRoIHead',
     'SCNetRoIHead', 'SCNetMaskHead', 'SCNetSemanticHead', 'SCNetBBoxHead',
     'FeatureRelayHead', 'GlobalContextHead', 'MultiInstanceRoIHead',
-    'IclipRoIHead', 'IclipRoIHeadSigmoid'
+    'IclipRoIHead', 'IclipRoIHeadSigmoid',
+    'IclipRoIHead2'
 ]

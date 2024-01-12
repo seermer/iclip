@@ -49,45 +49,6 @@ class IclipBBoxHead(BBoxHead):
         else:
             raise NotImplementedError
 
-    def forward(self, x: Tuple[Tensor], caption_feat_all_GPU) -> tuple:
-        """Forward features from the upstream network.
-
-        Args:
-            x (tuple[Tensor]): Features from the upstream network, each is
-                a 4D-tensor.
-
-        Returns:
-            tuple: A tuple of classification scores and bbox prediction.
-
-                - cls_score (Tensor): Classification scores for all
-                  scale levels, each is a 4D-tensor, the channels number
-                  is num_base_priors * num_classes.
-                - bbox_pred (Tensor): Box energies / deltas for all
-                  scale levels, each is a 4D-tensor, the channels number
-                  is num_base_priors * 4.
-        """
-        background = F.normalize(self.background, dim=1)
-        self.num_classes = len(caption_feat_all_GPU)
-        caption_feat_all_GPU = torch.cat((caption_feat_all_GPU, background), dim=0)
-        caption_feat_all_GPU = caption_feat_all_GPU.to(torch.float32).T
-
-        if self.with_avg_pool:
-            if x.numel() > 0:
-                x = self.avg_pool(x)
-                x = x.view(x.size(0), -1)
-            else:
-                # avg_pool does not support empty tensor,
-                # so use torch.mean instead it
-                x = torch.mean(x, dim=(-1, -2))
-
-        outputs_cls_feat = self.fc_cls(x)
-        outputs_cls_feat = F.normalize(outputs_cls_feat, dim=1)
-        temperature = torch.clip(self.logit_scale.exp(), min=None, max=100.0)
-        cls_score = outputs_cls_feat @ caption_feat_all_GPU * temperature
-
-        bbox_pred = self.fc_reg(x)
-        return cls_score, bbox_pred
-
     def loss(self,
              cls_score: Tensor,
              bbox_pred: Tensor,

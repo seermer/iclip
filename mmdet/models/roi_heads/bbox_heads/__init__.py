@@ -13,10 +13,13 @@ from .iclip_convfc_bbox_head import IclipShared4Conv1FCBBoxHead, IclipShared2FCB
 from .iclip_convfc_bbox_head_sigmoid import (IclipShared4Conv1FCBBoxHeadSigmoid, IclipShared2FCBBoxHeadSigmoid,
                                              IclipConvFCBBoxHeadSigmoid)
 
+from .iclip_convfc_bbox_head2 import IclipShared4Conv1FCBBoxHead2  # vild like
+
 __all__ = [
     'BBoxHead', 'ConvFCBBoxHead', 'Shared2FCBBoxHead',
     'Shared4Conv1FCBBoxHead', 'DoubleConvFCBBoxHead', 'SABLHead', 'DIIHead',
     'SCNetBBoxHead', 'MultiInstanceBBoxHead',
     'IclipBBoxHead', 'IclipShared4Conv1FCBBoxHead', 'IclipShared2FCBBoxHead', 'IclipConvFCBBoxHead',
-    'IclipShared4Conv1FCBBoxHeadSigmoid', 'IclipShared2FCBBoxHeadSigmoid', 'IclipConvFCBBoxHeadSigmoid'
+    'IclipShared4Conv1FCBBoxHeadSigmoid', 'IclipShared2FCBBoxHeadSigmoid', 'IclipConvFCBBoxHeadSigmoid',
+    'IclipShared4Conv1FCBBoxHead2'
 ]
