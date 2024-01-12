@@ -13,7 +13,7 @@ from mmdet.utils.logger import print_log
 
 
 @MODELS.register_module()
-class ConvFCBBoxHead(IclipBBoxHead):
+class ConvFCBBoxHead2(IclipBBoxHead):
     r"""More general bbox head, with shared conv and fc layers and two optional
     separated branches.
 
@@ -39,7 +39,7 @@ class ConvFCBBoxHead(IclipBBoxHead):
                  ensemble=False,
                  *args,
                  **kwargs):
-        super(ConvFCBBoxHead, self).__init__(*args, init_cfg=init_cfg, **kwargs)
+        super(ConvFCBBoxHead2, self).__init__(*args, init_cfg=init_cfg, **kwargs)
         assert (num_shared_convs + num_shared_fcs + num_cls_convs +
                 num_cls_fcs + num_reg_convs + num_reg_fcs > 0)
         if num_cls_convs > 0 or num_reg_convs > 0:
@@ -157,7 +157,7 @@ class ConvFCBBoxHead(IclipBBoxHead):
         return branch_convs, branch_fcs, last_layer_dim
 
     def init_weights(self):
-        super(ConvFCBBoxHead, self).init_weights()
+        super(ConvFCBBoxHead2, self).init_weights()
         # conv layers are already initialized by ConvModule
         for module_list in [self.shared_fcs, self.cls_fcs, self.reg_fcs]:
             for m in module_list.modules():
@@ -197,7 +197,7 @@ class ConvFCBBoxHead(IclipBBoxHead):
 
 
 @MODELS.register_module()
-class IclipShared2FCBBoxHead2(ConvFCBBoxHead):
+class IclipShared2FCBBoxHead2(ConvFCBBoxHead2):
 
     def __init__(self, fc_out_channels=1024, *args, **kwargs):
         super(IclipShared2FCBBoxHead2, self).__init__(
@@ -213,7 +213,7 @@ class IclipShared2FCBBoxHead2(ConvFCBBoxHead):
 
 
 @MODELS.register_module()
-class IclipShared4Conv1FCBBoxHead2(ConvFCBBoxHead):
+class IclipShared4Conv1FCBBoxHead2(ConvFCBBoxHead2):
 
     def __init__(self, fc_out_channels=1024, *args, **kwargs):
         super(IclipShared4Conv1FCBBoxHead2, self).__init__(
