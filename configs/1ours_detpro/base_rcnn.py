@@ -44,7 +44,6 @@ train_dataloader = dict(
     dataset=train_dataset)
 
 model = dict(
-    pretrained='open-mmlab://detectron2/resnet50_caffe',
     data_preprocessor=dict(
         type='DetDataPreprocessor',
         mean=[123.675, 116.28, 103.53],
@@ -59,7 +58,8 @@ model = dict(
         frozen_stages=-1,
         norm_cfg=dict(type='SyncBN', requires_grad=True),
         norm_eval=True,
-        style='caffe'),
+        style='caffe',
+        init_cfg=dict(type='Pretrained', checkpoint='open-mmlab://detectron2/resnet50_caffe')),
     neck=dict(
         type='FPN',
         in_channels=[256, 512, 1024, 2048],
