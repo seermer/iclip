@@ -19,13 +19,6 @@ train_cfg = dict(
     max_iters=max_iters,
     val_interval=10000000000000)
 
-default_hooks = dict(
-    checkpoint=dict(
-        type='CheckpointHook',
-        by_epoch=False,
-        interval=5000,
-        max_keep_ckpts=3))
-
 # train_cfg = dict(max_epochs=1, type='EpochBasedTrainLoop', val_interval=10000000000000)
 val_cfg = None
 val_dataloader = None

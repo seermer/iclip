@@ -107,3 +107,10 @@ model = dict(
         )
     )
 )
+
+default_hooks = dict(
+    checkpoint=dict(
+        type='CheckpointHook',
+        by_epoch=False,
+        interval=5000,
+        max_keep_ckpts=3))
