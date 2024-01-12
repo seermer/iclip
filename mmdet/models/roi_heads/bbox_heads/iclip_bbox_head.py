@@ -33,7 +33,6 @@ class IclipBBoxHead(BBoxHead):
                  *args,
                  **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        assert self.with_cls and self.with_reg and self.reg_class_agnostic
 
         in_channels = self.in_channels
         cls_channels = self.num_classes
