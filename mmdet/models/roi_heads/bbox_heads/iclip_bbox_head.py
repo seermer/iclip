@@ -29,24 +29,9 @@ class IclipBBoxHead(BBoxHead):
     regression respectively."""
 
     def __init__(self,
-                 bg_embedding='random_init',
                  *args,
                  **kwargs) -> None:
         super().__init__(*args, **kwargs)
-
-        in_channels = self.in_channels
-        cls_channels = self.num_classes
-        cls_predictor_cfg_ = self.cls_predictor_cfg.copy()
-        cls_predictor_cfg_.update(
-            in_features=in_channels, out_features=cls_channels)
-        self.fc_cls = MODELS.build(cls_predictor_cfg_)
-
-        self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
-
-        if bg_embedding == 'random_init':
-            self.background = nn.Parameter(torch.randn(1, self.num_classes), requires_grad=True)
-        else:
-            raise NotImplementedError
 
     def loss(self,
              cls_score: Tensor,

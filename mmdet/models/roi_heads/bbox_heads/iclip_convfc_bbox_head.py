@@ -2,6 +2,7 @@
 from typing import Optional, Tuple, Union
 
 import torch
+import numpy as np
 import torch.nn.functional as F
 import torch.nn as nn
 from mmcv.cnn import ConvModule
@@ -42,6 +43,18 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
         super().__init__(*args, init_cfg=init_cfg, **kwargs)
         assert (num_shared_convs + num_shared_fcs + num_cls_convs +
                 num_cls_fcs + num_reg_convs + num_reg_fcs > 0)
+
+        in_channels = self.in_channels
+        cls_channels = self.num_classes
+        cls_predictor_cfg_ = self.cls_predictor_cfg.copy()
+        cls_predictor_cfg_.update(
+            in_features=in_channels, out_features=cls_channels)
+        self.fc_cls = MODELS.build(cls_predictor_cfg_)
+
+        self.logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
+
+        self.background = nn.Parameter(torch.randn(1, self.num_classes), requires_grad=True)
+
         if num_cls_convs > 0 or num_reg_convs > 0:
             assert num_shared_fcs == 0
         if not self.with_cls:
@@ -150,7 +163,7 @@ class IclipConvFCBBoxHead(IclipBBoxHead):
             # for shared branch, only consider self.with_avg_pool
             # for separated branches, also consider self.num_shared_fcs
             if (is_shared
-                    or self.num_shared_fcs == 0) and not self.with_avg_pool:
+                or self.num_shared_fcs == 0) and not self.with_avg_pool:
                 last_layer_dim *= self.roi_feat_area
             for i in range(num_branch_fcs):
                 fc_in_channels = (

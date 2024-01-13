@@ -69,6 +69,7 @@ class IclipRoIHead2(IclipRoIHead):
         region_embeddings_image = torch.nn.functional.normalize(region_embeddings_image, p=2, dim=1)
         cls_score = region_embeddings_image @ caption_feat_all_GPU.T
         cls_score /= self.temperature
+        print_log(f'DEBUG CLS_SCORE {bbox_pred.shape, region_embeddings_image.shape, caption_feat_all_GPU.shape, cls_score.shape}')
 
         bbox_results = dict(
             cls_score=cls_score, bbox_pred=bbox_pred, bbox_feats=bbox_feats)
