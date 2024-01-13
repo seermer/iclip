@@ -57,7 +57,7 @@ model = dict(
         out_indices=(0, 1, 2, 3),
         frozen_stages=-1,
         norm_cfg=dict(type='SyncBN', requires_grad=True),
-        norm_eval=True,
+        norm_eval=False,
         style='caffe',
         init_cfg=dict(type='Pretrained', checkpoint='open-mmlab://detectron2/resnet50_caffe')),
     neck=dict(
