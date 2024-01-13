@@ -70,9 +70,9 @@ class ConvFCBBoxHead2(IclipBBoxHead):
         self.shared_out_channels = last_layer_dim
 
         # add cls specific branch
-        self.cls_convs, self.cls_fcs, self.cls_last_dim = \
-            self._add_conv_fc_branch(
-                self.num_cls_convs, self.num_cls_fcs, self.shared_out_channels)
+        # self.cls_convs, self.cls_fcs, self.cls_last_dim = \
+        #     self._add_conv_fc_branch(
+        #         self.num_cls_convs, self.num_cls_fcs, self.shared_out_channels)
 
         # add reg specific branch
         self.reg_convs, self.reg_fcs, self.reg_last_dim = \

@@ -27,8 +27,8 @@ class IclipRoIHead2(IclipRoIHead):
         nn.init.constant_(self.bg_embedding.bias, 0)
 
         self.projection = nn.Linear(1024, 512)
-        # self.temperature = 0.01
-        self.temperature = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
+        self.temperature = 0.01
+        # self.temperature = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
         nn.init.xavier_uniform_(self.projection.weight)
         nn.init.constant_(self.projection.bias, 0)
 
@@ -72,10 +72,10 @@ class IclipRoIHead2(IclipRoIHead):
         region_embeddings_image = self.projection(region_embeddings)
         region_embeddings_image = torch.nn.functional.normalize(region_embeddings_image, p=2, dim=1)
         cls_score = region_embeddings_image @ caption_feat_all_GPU.T
-        # cls_score /= self.temperature
-        temperature = torch.clip(self.temperature.exp(), min=None, max=100.0)
-        print_log(f'[DEBUG] TEMPERATURE {temperature}', 'current')
-        cls_score *= temperature
+        cls_score /= self.temperature
+        # temperature = torch.clip(self.temperature.exp(), min=None, max=100.0)
+        # print_log(f'[DEBUG] TEMPERATURE {temperature}', 'current')
+        # cls_score *= temperature
 
         bbox_results = dict(
             cls_score=cls_score, bbox_pred=bbox_pred, bbox_feats=bbox_feats)
