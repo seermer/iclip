@@ -29,7 +29,7 @@ train_dataset = dict(
         pipeline=[
             dict(type='LoadImageFromFile', backend_args=None),
             dict(type='LoadExtractClipText',
-                 text_encoder_model='ViT-B/32',
+                 text_encoder_model='RN50',
                  save_folder=data_root + 'capfeat/', init_clip=False, ann_file=data_root + 'annotation.json')
         ],
         filter_cfg=dict(filter_empty_gt=False),
@@ -44,28 +44,28 @@ train_dataloader = dict(
     dataset=train_dataset)
 
 model = dict(
-    # data_preprocessor=dict(
-    #     type='DetDataPreprocessor',
-    #     mean=[123.675, 116.28, 103.53],
-    #     std=[58.395, 57.12, 57.375],
-    #     bgr_to_rgb=True,
-    #     pad_size_divisor=32),
-    # backbone=dict(
-    #     type='ResNet',
-    #     depth=50,
-    #     num_stages=4,
-    #     out_indices=(0, 1, 2, 3),
-    #     frozen_stages=-1,
-    #     norm_cfg=dict(type='SyncBN', requires_grad=True),
-    #     norm_eval=True,
-    #     style='caffe',
-    #     init_cfg=dict(type='Pretrained', checkpoint='open-mmlab://detectron2/resnet50_caffe')),
-    # neck=dict(
-    #     type='FPN',
-    #     in_channels=[256, 512, 1024, 2048],
-    #     out_channels=256,
-    #     norm_cfg=dict(type='SyncBN', requires_grad=True),
-    #     num_outs=5),
+    data_preprocessor=dict(
+        type='DetDataPreprocessor',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        bgr_to_rgb=True,
+        pad_size_divisor=32),
+    backbone=dict(
+        type='ResNet',
+        depth=50,
+        num_stages=4,
+        out_indices=(0, 1, 2, 3),
+        frozen_stages=-1,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        norm_eval=True,
+        style='caffe',
+        init_cfg=dict(type='Pretrained', checkpoint='open-mmlab://detectron2/resnet50_caffe')),
+    neck=dict(
+        type='FPN',
+        in_channels=[256, 512, 1024, 2048],
+        out_channels=256,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        num_outs=5),
     roi_head=dict(
         type='IclipRoIHead',
         bbox_roi_extractor=dict(
@@ -78,7 +78,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=512,
+            num_classes=1024,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
                 target_means=[0., 0., 0., 0.],
