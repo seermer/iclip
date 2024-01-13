@@ -29,7 +29,7 @@ train_dataset = dict(
         pipeline=[
             dict(type='LoadImageFromFile', backend_args=None),
             dict(type='LoadExtractClipText',
-                 text_encoder_model='RN50',
+                 text_encoder_model='ViT-B/32',
                  save_folder=data_root + 'capfeat/', init_clip=False, ann_file=data_root + 'annotation.json')
         ],
         filter_cfg=dict(filter_empty_gt=False),
@@ -56,7 +56,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=1024,
+            num_classes=512,
             bbox_coder=dict(
                 type='DeltaXYWHBBoxCoder',
                 target_means=[0., 0., 0., 0.],
