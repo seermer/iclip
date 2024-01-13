@@ -52,7 +52,7 @@ model = dict(
             out_channels=256,
             featmap_strides=[4, 8, 16, 32]),
         bbox_head=dict(
-            type='IclipShared2FCBBoxHead',
+            type='IclipShared4Conv1FCBBoxHead2',
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
@@ -64,7 +64,18 @@ model = dict(
             reg_class_agnostic=True,
             loss_cls=dict(
                 type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
-            loss_bbox=dict(type='L1Loss', loss_weight=1.0))), )
+            loss_bbox=dict(type='L1Loss', loss_weight=1.0))),
+    train_cfg=dict(
+        rcnn=dict(
+            sampler=dict(
+                add_gt_as_proposals=True,
+                neg_pos_ub=1.,
+                num=512,
+                pos_fraction=0.5,
+                type='RandomSampler')
+        )
+    )
+)
 
 max_iters = 102622  # 102622 is 1 epoch with batchsize 18*8  each iter == clip 43 epochs  18*8*102622 = 15M
 # 102622 is 1/3 epoch with bs      6*8   each iter == clip 135 iter    6*8*102622  = 5M
