@@ -75,7 +75,7 @@ class IclipRoIHead2(IclipRoIHead):
         # cls_score /= self.temperature
         temperature = torch.clip(self.temperature.exp(), min=None, max=100.0)
         print_log(f'[DEBUG] TEMPERATURE {temperature}', 'current')
-        cls_score /= temperature
+        cls_score *= temperature
 
         bbox_results = dict(
             cls_score=cls_score, bbox_pred=bbox_pred, bbox_feats=bbox_feats)
